@@ -1,0 +1,9 @@
+:root,
+::after,
+::before {
+	--spacing-1: 1rem;
+	--spacing-2: 1.5rem;
+	--spacing-3: 2rem;
+	--spacing-4: 3rem;
+	--spacing-5: 6rem;
+}
