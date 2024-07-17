@@ -107,8 +107,11 @@
 				<button class="tertiary" type="button" on:click={back}>Cancel</button>
 			</section>
 			<section id="actions">
-				<span>Need to <a href="/" on:click={() => (mode = 'register')}>Register?</a></span>
-				<a href="/" on:click={() => (mode = 'reset-password')}>Forgotten Password?</a>
+				<span
+					>Need to <button class="text" on:click={() => (mode = 'register')}>Register?</button
+					></span
+				>
+				<button class="text" on:click={() => (mode = 'reset-password')}>Forgotten Password?</button>
 			</section>
 		</form>
 	{/if}
