@@ -7,6 +7,7 @@
 	import { type FeedbackType, zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
 	import { adjacencyGraphs, dictionary as commonDictionary } from '@zxcvbn-ts/language-common';
 	import { translations, dictionary as englishDictionary } from '@zxcvbn-ts/language-en';
+	import Loader from '$lib/components/loader.svelte';
 
 	import { superForm } from 'sveltekit-superforms';
 	import { Field, Control, Label, FieldErrors } from 'formsnap';
@@ -19,24 +20,38 @@
 	export let back: () => void;
 	export let confirm: string;
 
-	const loginForm = superForm(loginData, { validators: zodClient(loginSchema) });
-	const { form: loginFormData, enhance: loginEnhance } = loginForm;
+	const loginForm = superForm(loginData, { validators: zodClient(loginSchema), delayMs: 150 });
+	const { form: loginFormData, enhance: loginEnhance, delayed: loginDelayed } = loginForm;
 
-	const registrationForm = superForm(registerData, { validators: zodClient(registerSchema) });
-	const { form: registrationFormData, enhance: registrationEnhance } = registrationForm;
+	const registrationForm = superForm(registerData, {
+		validators: zodClient(registerSchema),
+		delayMs: 150
+	});
+	const {
+		form: registrationFormData,
+		enhance: registrationEnhance,
+		delayed: registrationDelayed
+	} = registrationForm;
 
 	const confirmationForm = superForm(confirmationData, {
-		validators: zodClient(confirmationSchema)
+		validators: zodClient(confirmationSchema),
+		delayMs: 150
 	});
-	const { form: confirmationFormData, enhance: confirmationEnhance } = confirmationForm;
+	const {
+		form: confirmationFormData,
+		enhance: confirmationEnhance,
+		delayed: confirmationDelayed
+	} = confirmationForm;
 
 	const resetPasswordForm = superForm(resetPasswordData, {
-		validators: zodClient(resetPasswordSchema)
+		validators: zodClient(resetPasswordSchema),
+		delayMs: 150
 	});
 	const {
 		form: resetPasswordFormData,
 		enhance: resetPasswordEnhance,
-		message: resetPasswordMessage
+		message: resetPasswordMessage,
+		delayed: resetPasswordDelayed
 	} = resetPasswordForm;
 
 	zxcvbnOptions.setOptions({
@@ -72,7 +87,6 @@
 	{#if mode === 'login'}
 		<h4>Sign In</h4>
 		<h1>Welcome to 1dentity!</h1>
-
 		<form method="POST" action="?/login" use:loginEnhance>
 			<Field form={loginForm} name="email">
 				<div class="input-group">
@@ -80,7 +94,7 @@
 						<Label>Email Address</Label>
 						<input
 							{...attrs}
-							type="text"
+							type="email"
 							bind:value={$loginFormData.email}
 							placeholder="Email Address"
 						/>
@@ -103,8 +117,17 @@
 				</div>
 			</Field>
 			<section id="buttons">
-				<button class="primary">Login</button>
-				<button class="tertiary" type="button" on:click={back}>Cancel</button>
+				<button class="primary">
+					{#if $loginDelayed}
+						<Loader />
+					{:else}
+						Login
+					{/if}
+				</button>
+
+				<button class="tertiary" type="button" on:click={back} disabled={$loginDelayed}
+					>Cancel</button
+				>
 			</section>
 			<section id="actions">
 				<span
@@ -143,8 +166,16 @@
 				</div>
 			</Field>
 			<section id="buttons">
-				<button class="primary">Submit</button>
-				<button class="tertiary" type="button" on:click={back}>Cancel</button>
+				<button class="primary">
+					{#if $resetPasswordDelayed}
+						<Loader />
+					{:else}
+						Submit
+					{/if}
+				</button>
+				<button class="tertiary" type="button" on:click={back} disabled={$resetPasswordDelayed}
+					>Cancel</button
+				>
 			</section>
 		</form>
 	{/if}
@@ -219,8 +250,20 @@
 				<FieldErrors />
 			</Field>
 			<section id="buttons">
-				<button class="primary">Register</button>
-				<button class="tertiary" type="button" on:click={() => (mode = 'login')}>Cancel</button>
+				<button class="primary">
+					{#if $registrationDelayed}
+						<Loader />
+					{:else}
+						Register
+					{/if}
+				</button>
+
+				<button
+					class="tertiary"
+					type="button"
+					on:click={() => (mode = 'login')}
+					disabled={$registrationDelayed}>Cancel</button
+				>
 			</section>
 		</form>
 	{/if}
@@ -254,53 +297,19 @@
 				</div>
 			</Field>
 			<section id="buttons">
-				<button class="primary">Submit</button>
+				<button class="primary">
+					{#if $confirmationDelayed}
+						<Loader />
+					{:else}
+						Submit
+					{/if}
+				</button>
 			</section>
 		</form>
 	{/if}
 </div>
 
 <style>
-	.form {
-		background-color: var(--color-primary-2);
-		width: 100%;
-		margin-top: var(--spacing-2);
-		padding: var(--spacing-3) var(--spacing-1);
-		border-radius: 1rem;
-	}
-
-	p.message {
-		padding: var(--spacing-2) 0;
-		font-size: 1.5rem;
-		color: var(--color-success);
-	}
-
-	h4 {
-		font-family: 'Space Mono', sans-serif;
-		color: var(--color-primary-1);
-		text-transform: uppercase;
-		letter-spacing: 0.75rem;
-		padding-bottom: var(--spacing-4);
-	}
-
-	form {
-		border-top: 1px solid var(--color-emperor);
-		margin-top: var(--spacing-1);
-	}
-
-	form section#buttons {
-		margin-top: var(--spacing-3);
-		display: flex;
-		justify-content: space-between;
-	}
-
-	form section#actions {
-		display: flex;
-		justify-content: space-between;
-		margin-top: var(--spacing-4);
-		font-size: 1.35rem;
-	}
-
 	li.alert,
 	label[for='password-strength'] {
 		font-size: 1.35rem;

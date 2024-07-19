@@ -18,7 +18,12 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 	redirectTo.searchParams.delete('type');
 
 	if (token_hash && type) {
-		const { error } = await supabase.auth.verifyOtp({ type, token_hash });
+		console.log('CONFIRMING OTP');
+		console.log(type);
+		const { error, data } = await supabase.auth.verifyOtp({ type, token_hash });
+
+		console.log('OTP SESSION EXPIRES_N?');
+		console.log(data.session?.expires_in);
 
 		if (!error) {
 			redirectTo.searchParams.delete('next');

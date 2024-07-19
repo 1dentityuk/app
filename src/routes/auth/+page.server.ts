@@ -1,4 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
+import type { Provider } from '@supabase/supabase-js';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect, fail } from '@sveltejs/kit';
@@ -6,14 +7,17 @@ import { loginSchema } from './components/login-schema';
 import { registerSchema } from './components/register-schema';
 import { confirmationSchema } from './components/confirm-schema';
 import { resetPasswordSchema } from './components/reset-password-schema';
+import { magicLinkSchema } from './components/magic-link-schema';
+import { PUBLIC_ENVIRONMENT_URI } from '$env/static/public';
 
 export const load = (async () => {
 	const loginForm = await superValidate(zod(loginSchema), { id: 'login' });
 	const registrationForm = await superValidate(zod(registerSchema), { id: 'register' });
 	const confirmationForm = await superValidate(zod(confirmationSchema), { id: 'confirm' });
 	const resetPasswordForm = await superValidate(zod(resetPasswordSchema), { id: 'reset-password' });
+	const magicLinkForm = await superValidate(zod(magicLinkSchema), { id: 'magic-link' });
 
-	return { loginForm, registrationForm, confirmationForm, resetPasswordForm };
+	return { loginForm, registrationForm, confirmationForm, resetPasswordForm, magicLinkForm };
 }) satisfies PageServerLoad;
 
 export const actions = {
@@ -88,6 +92,41 @@ export const actions = {
 			return redirect(303, `auth/error?source=reset+password&reason=${error.message}`);
 		} else {
 			return message(form, 'Request Successful');
+		}
+	},
+
+	magicLink: async ({ request, locals: { supabase } }) => {
+		const form = await superValidate(request, zod(magicLinkSchema));
+
+		if (!form.valid) {
+			return fail(400, { magicLinkForm: form });
+		}
+
+		const email = form.data.email;
+		const { error } = await supabase.auth.signInWithOtp({ email });
+
+		if (error) {
+			console.error(error);
+			return redirect(303, `auth/error?source=magic+link&reason=${error.message}`);
+		} else {
+			return message(form, 'Magic Link Request Successful');
+		}
+	},
+
+	socials: async ({ request, locals: { supabase } }) => {
+		const provider = (await request.formData()).get('provider') as Provider;
+		const { data, error } = await supabase.auth.signInWithOAuth({
+			provider,
+			options: {
+				redirectTo: `${PUBLIC_ENVIRONMENT_URI}/auth/callback`
+			}
+		});
+
+		if (error) {
+			console.error(error);
+			return redirect(303, `auth/error?source=socials&reason=${error.message}`);
+		} else {
+			return redirect(303, data.url);
 		}
 	}
 } satisfies Actions;
