@@ -68,11 +68,11 @@ const authGuard = (async ({ event, resolve }) => {
 	event.locals.user = user;
 
 	if (!event.locals.session && !event.url.pathname.includes('/auth')) {
-		return redirect(303, '/auth');
+		redirect(303, '/auth');
 	}
 
 	if (event.locals.session && event.url.pathname.includes('/auth')) {
-		return redirect(303, '/');
+		redirect(303, '/');
 	}
 
 	return resolve(event);

@@ -8,6 +8,8 @@
 	$: screenWidth;
 	$: screenHeight;
 
+	const year = new Date().getFullYear();
+
 	function onResize() {
 		if (browser) {
 			screenWidth = window.innerWidth;
@@ -20,7 +22,7 @@
 
 <footer>
 	<p>
-		&copy; 2024 1dentity | <a href="/">Privacy Policy</a> | <a href="/">Terms of Service</a>
+		&copy; {year} 1dentity | <a href="/">Privacy Policy</a> | <a href="/">Terms of Service</a>
 		{#if browser}
 			| {screenWidth} x {screenHeight}
 		{/if}

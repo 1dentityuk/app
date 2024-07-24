@@ -71,7 +71,7 @@ export const actions = {
 
 		if (error) {
 			console.error(error);
-			return redirect(303, `auth/error?source=confirmation&reason=${error.message}`);
+			return redirect(303, `/auth/error?source=confirmation&reason=${error.message}`);
 		} else {
 			return redirect(303, '/');
 		}
@@ -89,7 +89,7 @@ export const actions = {
 
 		if (error) {
 			console.error(error);
-			return redirect(303, `auth/error?source=reset+password&reason=${error.message}`);
+			return redirect(303, `/auth/error?source=reset+password&reason=${error.message}`);
 		} else {
 			return message(form, 'Request Successful');
 		}
@@ -107,7 +107,7 @@ export const actions = {
 
 		if (error) {
 			console.error(error);
-			return redirect(303, `auth/error?source=magic+link&reason=${error.message}`);
+			return redirect(303, `/auth/error?source=magic+link&reason=${error.message}`);
 		} else {
 			return message(form, 'Magic Link Request Successful');
 		}
@@ -124,7 +124,7 @@ export const actions = {
 
 		if (error) {
 			console.error(error);
-			return redirect(303, `auth/error?source=socials&reason=${error.message}`);
+			return redirect(303, `/auth/error?source=socials&reason=${error.message}`);
 		} else {
 			return redirect(303, data.url);
 		}

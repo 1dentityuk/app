@@ -150,6 +150,31 @@ redirect_uri = "http://localhost:54321/auth/v1/callback"
 # or any other third-party OIDC providers.
 url = ""
 
+[auth.external.facebook]
+enabled = true
+client_id = "856801143171842"
+secret = "env(PRIVATE_FACEBOOK_SECRET)"
+
+[auth.external.linkedin_oidc]
+enabled = true
+client_id = "78rs5imelkpbmw"
+secret = "env(PRIVATE_LINKEDIN_SECRET)"
+
+[auth.external.slack_oidc]
+enabled = true
+client_id = "7453352330147.7455951802068"
+secret = "env(PRIVATE_SLACK_SECRET)"
+
+[auth.external.twitter]
+enabled = true
+client_id = "7UFPfO1x9FoEEQw9xLWc7oopa"
+secret = "env(PRIVATE_TWITTER_SECRET)"
+
+[auth.external.azure]
+enabled = true
+client_id = "fa1abca2-436b-4174-8d11-073b71ad05a7"
+secret = "env(PRIVATE_AZURE_SECRET)"
+
 [analytics]
 enabled = false
 port = 54327

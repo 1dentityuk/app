@@ -14,9 +14,9 @@ export const GET = async (event) => {
 			redirect(303, `/${next.slice(1)}`);
 		} else {
 			console.error(error);
-			redirect(303, `auth/error?source=socials&reason=${error.message}`);
+			redirect(303, `/auth/error?source=socials&reason=${error.message}`);
 		}
 	}
 
-	redirect(303, `auth/error?source=socials&reason=An+unknown+error+occurred`);
+	redirect(303, `/auth/error?source=socials&reason=An+unknown+error+occurred`);
 };
