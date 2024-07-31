@@ -1,24 +1,30 @@
+import type { Database } from '$types/database';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import { createServerClient } from '@supabase/ssr';
 import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
+import { userProfileQuery } from '$lib/database/userprofiles';
 
 const supabase = (async ({ event, resolve }) => {
-	event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
-		cookies: {
-			getAll: () => event.cookies.getAll(),
-			/**
-			 * SvelteKit's cookies API requires `path` to be explicitly set in
-			 * the cookie options. Setting `path` to `/` replicates previous/
-			 * standard behavior.
-			 */
-			setAll: (cookiesToSet) => {
-				cookiesToSet.forEach(({ name, value, options }) => {
-					event.cookies.set(name, value, { ...options, path: '/' });
-				});
+	event.locals.supabase = createServerClient<Database>(
+		PUBLIC_SUPABASE_URL,
+		PUBLIC_SUPABASE_ANON_KEY,
+		{
+			cookies: {
+				getAll: () => event.cookies.getAll(),
+				/**
+				 * SvelteKit's cookies API requires `path` to be explicitly set in
+				 * the cookie options. Setting `path` to `/` replicates previous/
+				 * standard behavior.
+				 */
+				setAll: (cookiesToSet) => {
+					cookiesToSet.forEach(({ name, value, options }) => {
+						event.cookies.set(name, value, { ...options, path: '/' });
+					});
+				}
 			}
 		}
-	});
+	);
 
 	if ('suppressGetSessionWarning' in event.locals.supabase.auth) {
 		// @ts-expect-error - suppressGetSessionWarning is not part of the official API
@@ -67,12 +73,33 @@ const authGuard = (async ({ event, resolve }) => {
 	event.locals.session = session;
 	event.locals.user = user;
 
-	if (!event.locals.session && !event.url.pathname.includes('/auth')) {
-		redirect(303, '/auth');
-	}
+	if (!event.url.searchParams.has('/logout')) {
+		if (!event.locals.session && !event.url.pathname.includes('/auth')) {
+			redirect(303, '/auth');
+		}
 
-	if (event.locals.session && event.url.pathname.includes('/auth')) {
-		redirect(303, '/');
+		if (event.locals.session && event.url.pathname.includes('/auth')) {
+			redirect(303, '/');
+		}
+
+		if (event.locals.user) {
+			if (!event.locals.userProfile) {
+				const { data, error } = await userProfileQuery(event.locals.supabase);
+				if (error) {
+					console.error(error);
+					throw error;
+				}
+
+				event.locals.userProfile = data;
+			}
+
+			if (
+				!event.locals.userProfile?.metadata?.ftuxComplete &&
+				!event.url.pathname.includes('/wizard')
+			) {
+				redirect(303, '/wizard');
+			}
+		}
 	}
 
 	return resolve(event);

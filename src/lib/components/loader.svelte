@@ -1,7 +1,3 @@
-<!-- <script lang="ts">
-	export let variant: 'primary' | 'secondary' | 'tertiary' = 'primary';
-</script> -->
-
 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 	<defs>
 		<filter id="spinner-gF01">

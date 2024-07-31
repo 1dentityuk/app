@@ -59,7 +59,7 @@ svg {
 	padding: 0 2rem;
 }
 
-button {
+button:not(.clear):not(.text) {
 	font-size: 1.3rem;
 	font-family: 'Space Mono', sans-serif;
 	padding: 1rem 2.2rem;
@@ -73,6 +73,11 @@ button {
 	z-index: 1;
 	overflow: hidden;
 	gap: 1rem;
+}
+
+button.clear {
+	background: transparent;
+	border: 0;
 }
 
 button.primary {
@@ -210,7 +215,7 @@ h4 {
 		max-width: 155rem;
 	}
 
-	button {
+	button:not(.clear):not(.text) {
 		font-size: 1.8rem;
 		padding: 1.3rem 2.6rem;
 	}

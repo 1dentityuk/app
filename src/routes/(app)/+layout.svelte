@@ -1,10 +1,24 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import Header from '$lib/components/header.svelte';
+	import Footer from '$lib/components/footer.svelte';
 </script>
 
-<main>
-	<form action="/?/logout" method="POST" use:enhance>
-		<button>Logout</button>
-	</form>
-	<slot />
+<main class="content-wrapper">
+	<div class="content">
+		<Header />
+		<slot />
+	</div>
+	<Footer />
 </main>
+
+<style>
+	.content-wrapper {
+		display: flex;
+		flex-direction: column;
+		min-height: 100%;
+	}
+
+	.content {
+		flex: 1;
+	}
+</style>

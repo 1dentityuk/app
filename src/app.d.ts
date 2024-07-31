@@ -1,4 +1,5 @@
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
+import type { UserProfile } from '$lib/database/userprofiles';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -16,6 +17,7 @@ declare global {
 			safeGetSession: () => Promise<{ session: Session | null; user: User | null }>;
 			session: Session | null;
 			user: User | null;
+			userProfile: UserProfile | undefined;
 		}
 
 		interface PageData {

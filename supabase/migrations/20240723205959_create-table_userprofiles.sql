@@ -15,18 +15,26 @@ ALTER TABLE public.userprofiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Can only view own profile data"
     ON public.userprofiles
     FOR SELECT
-    USING ( auth.uid() = id );
+    TO authenticated
+    USING ( (SELECT auth.uid()) = id );
 
 CREATE POLICY "Can only update own profile data"
     ON public.userprofiles
     FOR UPDATE
-    USING ( auth.uid() = id );
+    TO authenticated
+    USING ( (SELECT auth.uid()) = id )
+    WITH CHECK ( (SELECT auth.uid()) = id );
 
 CREATE OR REPLACE FUNCTION public.create_userprofile()
 RETURNS TRIGGER AS $$
 BEGIN
 INSERT INTO public.userprofiles (id, first_name, last_name, known_by, public_key)
-VALUES (NEW.id, NEW.raw_user_meta_data ->> 'first_name', NEW.raw_user_meta_data ->> 'last_name', NEW.raw_user_meta_data ->> 'name', gen_random_uuid());
+VALUES (
+    NEW.id, 
+    NEW.raw_user_meta_data ->> 'first_name', 
+    NEW.raw_user_meta_data ->> 'last_name', 
+    NEW.raw_user_meta_data ->> 'name', 
+    gen_random_uuid());
 RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
