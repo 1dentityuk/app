@@ -16,7 +16,9 @@ const config = {
 		adapter: adapter(),
 
 		alias: {
-			$types: 'types'
+			$types: 'types',
+			$domain: 'src/domain',
+			$application: 'src/application'
 		}
 	}
 };

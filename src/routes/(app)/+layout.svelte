@@ -4,8 +4,8 @@
 </script>
 
 <main class="content-wrapper">
+	<Header />
 	<div class="content">
-		<Header />
 		<slot />
 	</div>
 	<Footer />
@@ -15,10 +15,12 @@
 	.content-wrapper {
 		display: flex;
 		flex-direction: column;
+		align-items: center;
 		min-height: 100%;
 	}
 
 	.content {
+		width: 90%;
 		flex: 1;
 	}
 </style>

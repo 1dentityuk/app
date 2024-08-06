@@ -3,7 +3,11 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/publi
 import { createServerClient } from '@supabase/ssr';
 import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import { userProfileQuery } from '$lib/database/userprofiles';
+import type { UserProfile } from '$domain/users/entities/user-profile';
+import { UserProfileQueries } from '$application/users/queries';
+import eventStore from '$application/event-store';
+
+let userProfile: UserProfile | undefined;
 
 const supabase = (async ({ event, resolve }) => {
 	event.locals.supabase = createServerClient<Database>(
@@ -83,20 +87,11 @@ const authGuard = (async ({ event, resolve }) => {
 		}
 
 		if (event.locals.user) {
-			if (!event.locals.userProfile) {
-				const { data, error } = await userProfileQuery(event.locals.supabase);
-				if (error) {
-					console.error(error);
-					throw error;
-				}
-
-				event.locals.userProfile = data;
+			if (!userProfile) {
+				userProfile = await UserProfileQueries.getCurrentUserProfile(event.locals.supabase);
 			}
 
-			if (
-				!event.locals.userProfile?.metadata?.ftuxComplete &&
-				!event.url.pathname.includes('/wizard')
-			) {
+			if (!userProfile.metadata?.ftuxComplete && !event.url.pathname.includes('/wizard')) {
 				redirect(303, '/wizard');
 			}
 		}
@@ -105,4 +100,10 @@ const authGuard = (async ({ event, resolve }) => {
 	return resolve(event);
 }) satisfies Handle;
 
-export const handle = sequence(supabase, authGuard) satisfies Handle;
+const eventStorage = (({ event, resolve }) => {
+	event.locals.eventStore = eventStore;
+
+	return resolve(event);
+}) satisfies Handle;
+
+export const handle = sequence(supabase, authGuard, eventStorage) satisfies Handle;
